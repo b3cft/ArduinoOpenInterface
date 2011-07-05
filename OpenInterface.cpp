@@ -19,6 +19,20 @@ void OpenInterface::handle()
 
 void OpenInterface::handleOpCode(byte oc)
 {
+#ifdef DEBUG_SERIAL
+  switch (oc)
+  {
+    case ('s'):
+        oc = oc_safe;
+    break;
+    case ('d'):
+        oc = oc_drive_direct;
+    break;
+    case ('g'):
+        oc = oc_sensors;
+    break;
+  }
+#endif
   switch (oc)
   {
      case (oc_start):
@@ -64,6 +78,9 @@ bool OpenInterface::readBytes(uint8_t* bytesIn, uint8_t count)
     {
       if (millis() > start + READ_TIMEOUT)
       {
+#ifdef DEBUG_SERIAL
+      Serial.println("Timeout");
+#endif
         return false;
       }
     }
