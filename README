@@ -1,0 +1,10 @@
+The code allows an Arduino to use the iRobot Open Interface and respond as if it is a Roomba/Create robot.
+
+The reason I have done this, is because I have built a robot platform that will be/is running www.ROS.org.
+I am bootstrapping my build by using the TurtleBot example, which expects an OI plaform.
+
+I'm in the UK and don't have easy access to a Create/Roomba, and anyway, I'm building my own.
+
+So this is a quick hack to get the ROS TurtleBot to run, until I build a full ROS node to control my platform.
+
+Bob. 
