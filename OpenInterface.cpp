@@ -115,7 +115,10 @@ void OpenInterface::drive()
          vel    = int(word(raw[0], raw[1]));
          radius = int(word(raw[2], raw[3]));
        }
-       return;
+       if (driveCallback)
+       {
+         (*driveCallback)(vel, radius);
+       }
 }
 
 void OpenInterface::driveDirect()
@@ -130,9 +133,9 @@ void OpenInterface::driveDirect()
          leftVel  = int(word(raw[2], raw[3]));
        }
 
-       if (directdrive)
+       if (driveDirectCallback)
        {
-    	   (*directdrive)(leftVel, rightVel);
+    	   (*driveDirectCallback)(leftVel, rightVel);
        }
 }
 

@@ -47,17 +47,20 @@
 
 #include <inttypes.h>
 #include <WProgram.h>
+
 /**
- * Callback function for driving
+ * Callback functions for user implemented features
  */
-typedef void (*directdrive_callback)(int, int);
+typedef void (*drivedirect_callback)(int, int);
+typedef void (*drive_callback)(int, int);
 
 class OpenInterface
 {
 private:
 	uint8_t OIMode;
 
-	directdrive_callback directdrive;
+	drivedirect_callback driveDirectCallback;
+	drive_callback driveCallback;
 
 	void handleOpCode(byte);
 
@@ -91,7 +94,8 @@ public:
 	 */
 	void handle();
 
-	void registerDirectDrive(directdrive_callback f){directdrive = f;}
+	void registerDriveDirect(drivedirect_callback f){driveDirectCallback = f;}
+  void registerDrive(drive_callback f){driveCallback = f;}
 };
 
 #endif
