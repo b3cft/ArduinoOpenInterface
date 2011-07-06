@@ -107,6 +107,9 @@ bool OpenInterface::readBytes(uint8_t* bytesIn, uint8_t count)
  */
 uint8_t OpenInterface::getPacketId(uint8_t id, uint8_t num=1)
 {
+  /**
+   * @todo Move sensors to definitions
+   */
   switch(id)
   {
     case(17): // IR Sensor 255 = no signal
