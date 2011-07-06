@@ -21,6 +21,7 @@ OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 #include "OpenInterface.h"
+//#define DEBUG_SERIAL
 
 OpenInterface::OpenInterface()
 {
@@ -139,27 +140,27 @@ uint8_t OpenInterface::getPacketId(uint8_t id, uint8_t num=1)
     break;
 
     case(22): // Battery voltage in mV  2 bytes
-      if (num==1) return 0x17;
-      if (num==2) return 0x70;
+      if (num==1) return (batteryVoltage & 0xff00) >> 8;
+      if (num==2) return (batteryVoltage & 0xff);
     break;
 
     case(23): // battery current in/out in mA 2 bytes
-      if (num==1) return 0x02;
-      if (num==2) return 0xEE;
+      if (num==1) return (batteryCurrent & 0xff00) >> 8;
+      if (num==2) return (batteryCurrent & 0xff);
     break;
 
     case(24): // Battery temp in C
-      return 24;
+      return batteryTemperature;
     break;
 
     case(25): // Battery charge in mAh 2 bytes
-      if (num==1) return 0x17;
-      if (num==2) return 0x70;
+      if (num==1) return (batteryCharge & 0xff00) >> 8;
+      if (num==2) return (batteryCharge & 0xff);
     break;
 
     case(26): // Battery charge estimated in mAh  2 bytes
-      if (num==1) return 0x17;
-      if (num==2) return 0x70;
+      if (num==1) return (batteryChargeEstimate & 0xff00) >> 8;
+      if (num==2) return (batteryChargeEstimate & 0xff);
     break;
 
     case(35): // OI Mode
@@ -217,6 +218,40 @@ bool OpenInterface::in_array(uint8_t needle, uint8_t* haystack, uint8_t max)
 }
 
 /**
+ * ************ Sensor Interactions ****************
+ */
+
+void OpenInterface::setBatteryInfo(int voltage, int current, int charge, int chargeEstimate, uint8_t temperature)
+{
+  batteryVoltage        = voltage;
+  batteryCurrent        = current;
+  batteryCharge         = charge;
+  batteryChargeEstimate = chargeEstimate;
+  batteryTemperature    = temperature;
+}
+void OpenInterface::updateBatteryVoltageCurrent(int voltage, int current)
+{
+  batteryVoltage = voltage;
+  batteryCurrent = current;
+}
+void OpenInterface::updateBatteryCurrent(int current)
+{
+  batteryCurrent = current;
+}
+void OpenInterface::updateBatteryChargeEstimate(int chargeEstimate)
+{
+  batteryChargeEstimate = chargeEstimate;
+}
+void OpenInterface::updateBatteryVoltage(int voltage)
+{
+  batteryVoltage = voltage;
+}
+void OpenInterface::updateBatteryTemperature(uint8_t temperature)
+{
+  batteryTemperature = temperature;
+}
+
+/**
  * ************ Handle Op Codes ****************
  */
 
@@ -229,6 +264,9 @@ void OpenInterface::getSensors()
     uint8_t id[1], pStart, pStop, sensorLen;
     char strId[3];
     readBytes(id, 1);
+#ifdef DEBUG_SERIAL
+    id[0] = PACKET_GRP_7_42;
+#endif
     switch (id[0])
     {
       case (PACKET_GRP_7_26):
@@ -289,12 +327,11 @@ void OpenInterface::getSensors()
       if(in_array(p, doublePackets, sizeof(doublePackets)/sizeof(uint8_t)))
       {
 #ifdef DEBUG_SERIAL
-        Serial.print("byte[");Serial.print(packet, DEC);Serial.print("] packet[");Serial.print(p, DEC);Serial.print("]: ");Serial.println(getPacketId(p), DEC);
+        Serial.print("byte[");Serial.print(packet, DEC);Serial.print("] packet[");Serial.print(p, DEC);Serial.print("]: ");Serial.println(getPacketId(p, 2), DEC);
 #endif
         sensor[packet++] = getPacketId(p, 2);
       }
     }
-
     Serial.write(sensor, sensorLen);
 }
 

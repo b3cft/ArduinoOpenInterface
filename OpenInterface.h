@@ -81,6 +81,12 @@ class OpenInterface
 private:
 	uint8_t OIMode;
 
+	uint8_t batteryTemperature;
+	int batteryVoltage;
+	int batteryCurrent;
+	int batteryCharge;
+	int batteryChargeEstimate;
+
 	drivedirect_callback driveDirectCallback;
 	drive_callback driveCallback;
 
@@ -121,6 +127,16 @@ public:
 	 */
 	void registerDriveDirect(drivedirect_callback f){driveDirectCallback = f;}
   void registerDrive(drive_callback f){driveCallback = f;}
+
+  /**
+   * Battery sensor information
+   */
+  void setBatteryInfo(int, int, int, int, uint8_t);
+  void updateBatteryVoltageCurrent(int, int);
+  void updateBatteryCurrent(int);
+  void updateBatteryVoltage(int);
+  void updateBatteryTemperature(uint8_t);
+  void updateBatteryChargeEstimate(int);
 };
 
 #endif
