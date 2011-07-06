@@ -94,6 +94,9 @@ public:
 	 */
 	void handle();
 
+	/**
+	 * Register callbacks for user implemented features
+	 */
 	void registerDriveDirect(drivedirect_callback f){driveDirectCallback = f;}
   void registerDrive(drive_callback f){driveCallback = f;}
 };

@@ -4,11 +4,18 @@ OpenInterface::OpenInterface()
 {
 }
 
+/**
+ * Initialise the OpenInterface
+ * Create a serial connection at the specified baud rate
+ */
 void OpenInterface::init(long speed)
 {
   Serial.begin(speed);
 }
 
+/**
+ * Should be call in the Arduino loop() function to handle interaction with controller
+ */
 void OpenInterface::handle()
 {
   if (Serial.available())
@@ -17,6 +24,9 @@ void OpenInterface::handle()
   }
 }
 
+/**
+ * Process OI Op Codes passed by contoller
+ */
 void OpenInterface::handleOpCode(byte oc)
 {
 #ifdef DEBUG_SERIAL
@@ -69,6 +79,9 @@ void OpenInterface::handleOpCode(byte oc)
   }
 }
 
+/**
+ * Helper function to read a specified number of bytes from serial interface with a timeout
+ */
 bool OpenInterface::readBytes(uint8_t* bytesIn, uint8_t count)
 {
   while (count-- > 0)
@@ -89,56 +102,9 @@ bool OpenInterface::readBytes(uint8_t* bytesIn, uint8_t count)
   return true;
 }
 
-void OpenInterface::song()
-{
-    uint8_t details[2];
-    bool result = readBytes(details, 2);
-    if (result)
-    {
-      uint8_t notes[details[1]];
-      result = readBytes(notes, details[1]);
-      if (result)
-      {
-        // play song notes here.
-      }
-    }
-}
-
-void OpenInterface::drive()
-{
-       uint8_t raw[4];
-       int vel, radius;
-       bool result = readBytes(raw, 4);
-
-       if (result)
-       {
-         vel    = int(word(raw[0], raw[1]));
-         radius = int(word(raw[2], raw[3]));
-       }
-       if (driveCallback)
-       {
-         (*driveCallback)(vel, radius);
-       }
-}
-
-void OpenInterface::driveDirect()
-{
-       uint8_t raw[4];
-       int rightVel, leftVel;
-       bool result = readBytes(raw, 4);
-
-       if (result)
-       {
-         rightVel = int(word(raw[0], raw[1]));
-         leftVel  = int(word(raw[2], raw[3]));
-       }
-
-       if (driveDirectCallback)
-       {
-    	   (*driveDirectCallback)(leftVel, rightVel);
-       }
-}
-
+/**
+ * Return the sensor packet value
+ */
 uint8_t OpenInterface::getPacketId(uint8_t id, uint8_t num=1)
 {
   switch(id)
@@ -212,6 +178,9 @@ uint8_t OpenInterface::getPacketId(uint8_t id, uint8_t num=1)
   }
 }
 
+/**
+ * Helper function to return whether one int is contained within an array of ints
+ */
 bool OpenInterface::in_array(uint8_t needle, uint8_t* haystack, uint8_t max)
 {
     if (max==0) return false;
@@ -222,6 +191,13 @@ bool OpenInterface::in_array(uint8_t needle, uint8_t* haystack, uint8_t max)
     return false;
 }
 
+/**
+ * ************ Handle Op Codes ****************
+ */
+
+/**
+ * Handle the sensors Op Code. Handles groups and individual sensors
+ */
 void OpenInterface::getSensors()
 {
     uint8_t doublePackets[] = {19,20,22,23,25,26,27,28,29,30,31,33,39,40,41,42};
@@ -295,4 +271,63 @@ void OpenInterface::getSensors()
     }
 
     Serial.write(sensor, sensorLen);
+}
+
+/**
+ * Handle the song Op Code, callback to user function if defined
+ */
+void OpenInterface::song()
+{
+    uint8_t details[2];
+    bool result = readBytes(details, 2);
+    if (result)
+    {
+      uint8_t notes[details[1]];
+      result = readBytes(notes, details[1]);
+      if (result)
+      {
+        // play song notes here.
+      }
+    }
+}
+
+/**
+ * Handle the drive Op Code, callback to user function if defined
+ */
+void OpenInterface::drive()
+{
+       uint8_t raw[4];
+       int vel, radius;
+       bool result = readBytes(raw, 4);
+
+       if (result)
+       {
+         vel    = int(word(raw[0], raw[1]));
+         radius = int(word(raw[2], raw[3]));
+       }
+       if (driveCallback)
+       {
+         (*driveCallback)(vel, radius);
+       }
+}
+
+/**
+ * Handle the driveDirect op Code, callback to user function if defined
+ */
+void OpenInterface::driveDirect()
+{
+       uint8_t raw[4];
+       int rightVel, leftVel;
+       bool result = readBytes(raw, 4);
+
+       if (result)
+       {
+         rightVel = int(word(raw[0], raw[1]));
+         leftVel  = int(word(raw[2], raw[3]));
+       }
+
+       if (driveDirectCallback)
+       {
+    	   (*driveDirectCallback)(leftVel, rightVel);
+       }
 }
