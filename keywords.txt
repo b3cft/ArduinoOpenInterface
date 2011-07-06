@@ -1,5 +1,5 @@
 #######################################
-# Syntax Coloring Map For Matrix
+# Syntax Coloring Map For OpenInterface
 #######################################
 
 #######################################
@@ -14,7 +14,8 @@ OpenInterface KEYWORD1
 
 init 		        KEYWORD2
 handle              KEYWORD2
-registerDirectDrive KEYWORD2
+registerDriveDirect KEYWORD2
+registerDrive       KEYWORD2
 
 #######################################
 # Constants (LITERAL1)
