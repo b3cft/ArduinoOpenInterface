@@ -167,11 +167,31 @@ uint8_t OpenInterface::getPacketId(uint8_t id, uint8_t num=1)
       return OIMode;
     break;
 
+    case(39): // requested velocity in mm/s -500 / 500. 2 bytes
+      if (num==1) return (reqVelocity & 0xff00) >> 8;
+      if (num==2) return (reqVelocity & 0xff);
+    break;
+
+    case(40): // Requested radius 2 bytes
+      if (num==1) return (reqRadius & 0xff00) >> 8;
+      if (num==2) return (reqRadius & 0xff);
+    break;
+
+    case(41): // Right requested velocity mm/s -500/500. 2 bytes
+      if (num==1) return (reqRightVelocity & 0xff00) >> 8;
+      if (num==2) return (reqRightVelocity & 0xff);
+    break;
+
+    case(42): // Left requested velocity mm/s -500/500. 2 bytes
+      if (num==1) return (reqLeftVelocity & 0xff00) >> 8;
+      if (num==2) return (reqLeftVelocity & 0xff);
+    break;
+
     /*
     These are sensors yet to be implemented
-    case(7): // B 000, caster, l wheeldrop, r wheeldrop, bump l, bump r
-    case(8): // wall sensor
-    case(9): // left cliff
+    case(7):  // B 000, caster, l wheeldrop, r wheeldrop, bump l, bump r
+    case(8):  // wall sensor
+    case(9):  // left cliff
     case(10): // left front cliff
     case(11): // right front cliff
     case(12): // right cliff
@@ -358,19 +378,20 @@ void OpenInterface::song()
  */
 void OpenInterface::drive()
 {
-       uint8_t raw[4];
-       int vel, radius;
-       bool result = readBytes(raw, 4);
+  uint8_t raw[4];
+  bool result = readBytes(raw, 4);
 
-       if (result)
-       {
-         vel    = int(word(raw[0], raw[1]));
-         radius = int(word(raw[2], raw[3]));
-       }
-       if (driveCallback)
-       {
-         (*driveCallback)(vel, radius);
-       }
+  if (result)
+  {
+    reqVelocity      = int(word(raw[0], raw[1]));
+    reqRadius        = int(word(raw[2], raw[3]));
+    reqLeftVelocity  = 0;
+    reqRightVelocity = 0;
+    if (driveCallback)
+    {
+      (*driveCallback)(reqVelocity, reqRadius);
+    }
+  }
 }
 
 /**
@@ -378,18 +399,18 @@ void OpenInterface::drive()
  */
 void OpenInterface::driveDirect()
 {
-       uint8_t raw[4];
-       int rightVel, leftVel;
-       bool result = readBytes(raw, 4);
+  uint8_t raw[4];
+  bool result = readBytes(raw, 4);
 
-       if (result)
-       {
-         rightVel = int(word(raw[0], raw[1]));
-         leftVel  = int(word(raw[2], raw[3]));
-       }
-
-       if (driveDirectCallback)
-       {
-    	   (*driveDirectCallback)(leftVel, rightVel);
-       }
+  if (result)
+  {
+    reqRightVelocity = int(word(raw[0], raw[1]));
+    reqLeftVelocity  = int(word(raw[2], raw[3]));
+    reqVelocity      = 0;
+    reqRadius        = 0;
+    if (driveDirectCallback)
+    {
+      (*driveDirectCallback)(reqLeftVelocity, reqRightVelocity);
+    }
+  }
 }

@@ -87,6 +87,11 @@ private:
 	int batteryCharge;
 	int batteryChargeEstimate;
 
+	int reqVelocity;
+	int reqRadius;
+	int reqLeftVelocity;
+	int reqRightVelocity;
+
 	drivedirect_callback driveDirectCallback;
 	drive_callback driveCallback;
 
