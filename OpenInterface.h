@@ -1,37 +1,59 @@
+/*
+Copyright (c) 2011 Andy "Bob" Brockhurst
+
+Permission is hereby granted, free of charge, to any person obtaining
+a copy of this software and associated documentation files (the
+"Software"), to deal in the Software without restriction, including
+without limitation the rights to use, copy, modify, merge, publish,
+distribute, sublicense, and/or sell copies of the Software, and to
+permit persons to whom the Software is furnished to do so, subject to
+the following conditions:
+
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+*/
 #ifndef OpenInterface_h
 #define OpenInterface_h
 
 //OP Codes
-#define oc_start                0x80 //128
-#define oc_baud                 0x81 //129
-#define oc_control              0x82 //130
-#define oc_safe                 0x83 //131
-#define oc_full                 0x84 //132
-#define oc_power                0x85 //133
-#define oc_spot                 0x86 //134
-#define oc_clean                0x87 //135
-#define oc_max                  0x88 //136
-#define oc_drive                0x89 //137
-#define oc_low_side_drivers     0x8a //138
-#define oc_leds                 0x8b //139
-#define oc_song                 0x8c //140
-#define oc_play_song            0x8d //141
-#define oc_sensors              0x8e //142
-#define oc_force_seeking_dock   0x8f //143
-#define oc_pwm_low_side_drivers 0x90 //144
-#define oc_drive_direct         0x91 //145
-#define oc_digital_outputs      0x93 //147
-#define oc_stream               0x94 //148
-#define oc_query_list           0x95 //149
-#define oc_pause_resume_stream  0x96 //150
-#define oc_send_ir              0x97 //151
-#define oc_script               0x98 //152
-#define oc_play_script          0x99 //153
-#define oc_show_script          0x9a //154
-#define oc_wait_time            0x9b //155
-#define oc_wait_distance        0x9c //156
-#define oc_wait_angle           0x9d //157
-#define oc_wait_event           0x9e //158
+#define OC_START                0x80 //128
+#define OC_BAUD                 0x81 //129
+#define OC_CONTROL              0x82 //130
+#define OC_SAFE                 0x83 //131
+#define OC_FULL                 0x84 //132
+#define OC_POWER                0x85 //133
+#define OC_SPOT                 0x86 //134
+#define OC_CLEAN                0x87 //135
+#define OC_MAX                  0x88 //136
+#define OC_DRIVE                0x89 //137
+#define OC_LOW_SIDE_DRIVERS     0x8a //138
+#define OC_LEDS                 0x8b //139
+#define OC_SONG                 0x8c //140
+#define OC_PLAY_SONG            0x8d //141
+#define OC_SENSORS              0x8e //142
+#define OC_FORCE_SEEKING_DOCK   0x8f //143
+#define OC_PWM_LOW_SIDE_DRIVERS 0x90 //144
+#define OC_DIRECT_DRIVE         0x91 //145
+#define OC_DIGITAL_OUTPUTS      0x93 //147
+#define OC_STREAM               0x94 //148
+#define OC_QUERY_LIST           0x95 //149
+#define OC_PAUSE_RESUME_STREAM  0x96 //150
+#define OC_SEND_IR              0x97 //151
+#define OC_SCRIPT               0x98 //152
+#define OC_PLAY_SCRIPT          0x99 //153
+#define OC_SHOW_SCRIPT          0x9a //154
+#define OC_WAIT_TIME            0x9b //155
+#define OC_WAIT_DISTANCE        0x9c //156
+#define OC_WAIT_ANGLE           0x9d //157
+#define OC_WAIT_EVENT           0x9e //158
 
 // Sensor Packet Groups
 #define PACKET_GRP_7_26   0

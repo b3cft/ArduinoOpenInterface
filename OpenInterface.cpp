@@ -1,3 +1,25 @@
+/*
+Copyright (c) 2011 Andy "Bob" Brockhurst
+
+Permission is hereby granted, free of charge, to any person obtaining
+a copy of this software and associated documentation files (the
+"Software"), to deal in the Software without restriction, including
+without limitation the rights to use, copy, modify, merge, publish,
+distribute, sublicense, and/or sell copies of the Software, and to
+permit persons to whom the Software is furnished to do so, subject to
+the following conditions:
+
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+*/
 #include "OpenInterface.h"
 
 OpenInterface::OpenInterface()
@@ -25,7 +47,7 @@ void OpenInterface::handle()
 }
 
 /**
- * Process OI Op Codes passed by contoller
+ * Process OI Op Codes passed by controller
  */
 void OpenInterface::handleOpCode(byte oc)
 {
@@ -33,47 +55,47 @@ void OpenInterface::handleOpCode(byte oc)
   switch (oc)
   {
     case ('s'):
-        oc = oc_safe;
+        oc = OC_SAFE;
     break;
     case ('d'):
-        oc = oc_drive_direct;
+        oc = OC_DIRECT_DRIVE;
     break;
     case ('g'):
-        oc = oc_sensors;
+        oc = OC_SENSORS;
     break;
   }
 #endif
   switch (oc)
   {
-     case (oc_start):
+     case (OC_START):
        OIMode = 1; // passive
      break;
 
-     case (oc_baud):
+     case (OC_BAUD):
      break;
 
-     case (oc_control):
-     case (oc_safe):
+     case (OC_CONTROL):
+     case (OC_SAFE):
        OIMode = 2; //safe
      break;
 
-     case (oc_sensors):
+     case (OC_SENSORS):
        getSensors();
      break;
 
-     case (oc_song):
+     case (OC_SONG):
        song();
      break;
 
-     case (oc_drive_direct):
+     case (OC_DIRECT_DRIVE):
        driveDirect();
      break;
 
-     case (oc_drive):
+     case (OC_DRIVE):
        drive();
      break;
 
-     case (oc_full):
+     case (OC_FULL):
        OIMode = 3; // full
      break;
   }
