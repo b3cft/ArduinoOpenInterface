@@ -70,6 +70,19 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #define OI_MODE_SAFE    2
 #define OI_MODE_FULL    3
 
+// Sensors
+#define OI_SENSOR_IR                17
+#define OI_SENSOR_BAT_VOLTAGE       22
+#define OI_SENSOR_BAT_CURRENT       23
+#define OI_SENSOR_BAT_TEMPERATURE   24
+#define OI_SENSOR_BAT_CHARGE        25
+#define OI_SENSOR_BAT_CHARGE_REMAIN 26
+#define OI_SENSOR_OI_MODE           35
+#define OI_SENSOR_REQ_VEL           39
+#define OI_SENSOR_REQ_RADIUS        40
+#define OI_SENSOR_REQ_RIGHT_VEL     41
+#define OI_SENSOR_REQ_LEFT_VEL      42
+
 // Other stuff
 #define READ_TIMEOUT 1000
 

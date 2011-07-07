@@ -136,54 +136,54 @@ uint8_t OpenInterface::getPacketId(uint8_t id, uint8_t num=1)
    */
   switch(id)
   {
-    case(17): // IR Sensor 255 = no signal
+    case(OI_SENSOR_IR): // 255 = no signal
       return 255;
     break;
 
-    case(22): // Battery voltage in mV  2 bytes
+    case(OI_SENSOR_BAT_VOLTAGE): // in mV
       if (num==1) return (batteryVoltage & 0xff00) >> 8;
       if (num==2) return (batteryVoltage & 0xff);
     break;
 
-    case(23): // battery current in/out in mA 2 bytes
+    case(OI_SENSOR_BAT_CURRENT): // mA
       if (num==1) return (batteryCurrent & 0xff00) >> 8;
       if (num==2) return (batteryCurrent & 0xff);
     break;
 
-    case(24): // Battery temp in C
+    case(OI_SENSOR_BAT_TEMPERATURE): // C
       return batteryTemperature;
     break;
 
-    case(25): // Battery charge in mAh 2 bytes
+    case(OI_SENSOR_BAT_CHARGE): // mAh
       if (num==1) return (batteryCharge & 0xff00) >> 8;
       if (num==2) return (batteryCharge & 0xff);
     break;
 
-    case(26): // Battery charge estimated in mAh  2 bytes
+    case(OI_SENSOR_BAT_CHARGE_REMAIN): // mAh
       if (num==1) return (batteryChargeEstimate & 0xff00) >> 8;
       if (num==2) return (batteryChargeEstimate & 0xff);
     break;
 
-    case(35): // OI Mode
+    case(OI_SENSOR_OI_MODE):
       return OIMode;
     break;
 
-    case(39): // requested velocity in mm/s -500 / 500. 2 bytes
+    case(OI_SENSOR_REQ_VEL): //  mm/s -500 / 500
       if (num==1) return (reqVelocity & 0xff00) >> 8;
       if (num==2) return (reqVelocity & 0xff);
     break;
 
-    case(40): // Requested radius 2 bytes
+    case(OI_SENSOR_REQ_RADIUS):// mm
       if (num==1) return (reqRadius & 0xff00) >> 8;
       if (num==2) return (reqRadius & 0xff);
     break;
 
-    case(41): // Right requested velocity mm/s -500/500. 2 bytes
+    case(OI_SENSOR_REQ_RIGHT_VEL): // mm/s -500/500
       if (num==1) return (reqRightVelocity & 0xff00) >> 8;
       if (num==2) return (reqRightVelocity & 0xff);
     break;
 
-    case(42): // Left requested velocity mm/s -500/500. 2 bytes
+    case(OI_SENSOR_REQ_LEFT_VEL): // mm/s -500/500
       if (num==1) return (reqLeftVelocity & 0xff00) >> 8;
       if (num==2) return (reqLeftVelocity & 0xff);
     break;
