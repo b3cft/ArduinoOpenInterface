@@ -29,6 +29,16 @@ void setup()
 }
 
 /**
+ * Callback function to handle songs
+ * Notes are passed as a array consisting of pairs; pitch & duration.
+ * See Create Open Interface V2 documentation (op code
+ */
+void playSong(uint8_t notes[])
+{
+
+}
+
+/**
  * Callback function to handle driveDirect commands
  */
 void driveDirect(int leftVel, int rightVel)

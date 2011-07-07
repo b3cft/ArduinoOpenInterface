@@ -75,6 +75,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 typedef void (*drivedirect_callback)(int, int);
 typedef void (*drive_callback)(int, int);
+typedef void (*song_callback)(uint8_t[]);
 
 class OpenInterface
 {
@@ -92,14 +93,19 @@ private:
 	int reqLeftVelocity;
 	int reqRightVelocity;
 
+	uint8_t songs[16][32];
+
 	drivedirect_callback driveDirectCallback;
 	drive_callback driveCallback;
+	song_callback songCallback;
 
 	void handleOpCode(byte);
 
 	void getSensors();
 
 	void song();
+
+	void songPlay();
 
 	void drive();
 
@@ -132,6 +138,7 @@ public:
 	 */
 	void registerDriveDirect(drivedirect_callback f){driveDirectCallback = f;}
   void registerDrive(drive_callback f){driveCallback = f;}
+  void registerSong(song_callback f){songCallback = f;}
 
   /**
    * Battery sensor information

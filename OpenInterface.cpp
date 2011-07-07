@@ -213,10 +213,6 @@ uint8_t OpenInterface::getPacketId(uint8_t id, uint8_t num=1)
     case(36): // current song
     case(37): // song playing
     case(38): // number of data stream packets
-    case(39): // requested velocity in mm/s -500 / 500. 2 bytes
-    case(40): // Requested radius 2 bytes
-    case(41): // Right requested velocity mm/s -500/500. 2 bytes
-    case(42): // Left requested velocity mm/s -500/500. 2 bytes
     */
     default:
       return 0;
@@ -356,21 +352,33 @@ void OpenInterface::getSensors()
 }
 
 /**
- * Handle the song Op Code, callback to user function if defined
+ * Handle the song Op Code store the song for playback later.
  */
 void OpenInterface::song()
 {
-    uint8_t details[2];
-    bool result = readBytes(details, 2);
-    if (result)
+  uint8_t details[2];
+  bool result = readBytes(details, 2);
+  if (result)
+  {
+    uint8_t notes[details[1]];
+    result = readBytes(songs[details[0]], details[1]);
+  }
+}
+
+/**
+ * Handle the song play op code, callback to user function if defined
+ */
+void OpenInterface::songPlay()
+{
+  uint8_t details[1];
+  bool result = readBytes(details, 1);
+  if (result)
+  {
+    if (result && songCallback)
     {
-      uint8_t notes[details[1]];
-      result = readBytes(notes, details[1]);
-      if (result)
-      {
-        // play song notes here.
-      }
+      (*songCallback)(songs[details[0]]);
     }
+  }
 }
 
 /**
