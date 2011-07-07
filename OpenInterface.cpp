@@ -25,6 +25,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 OpenInterface::OpenInterface()
 {
+  OIMode = OI_MODE_OFF;
 }
 
 /**
@@ -69,7 +70,7 @@ void OpenInterface::handleOpCode(byte oc)
   switch (oc)
   {
      case (OC_START):
-       OIMode = 1; // passive
+       OIMode = OI_MODE_PASSIVE;
      break;
 
      case (OC_BAUD):
@@ -77,7 +78,7 @@ void OpenInterface::handleOpCode(byte oc)
 
      case (OC_CONTROL):
      case (OC_SAFE):
-       OIMode = 2; //safe
+       OIMode = OI_MODE_SAFE;
      break;
 
      case (OC_SENSORS):
@@ -97,7 +98,7 @@ void OpenInterface::handleOpCode(byte oc)
      break;
 
      case (OC_FULL):
-       OIMode = 3; // full
+       OIMode = OI_MODE_FULL;
      break;
   }
 }

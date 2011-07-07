@@ -64,6 +64,12 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #define PACKET_GRP_35_42  5
 #define PACKET_GRP_7_42   6
 
+// OI Modes
+#define OI_MODE_OFF     0
+#define OI_MODE_PASSIVE 1
+#define OI_MODE_SAFE    2
+#define OI_MODE_FULL    3
+
 // Other stuff
 #define READ_TIMEOUT 1000
 
