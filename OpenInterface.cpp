@@ -70,6 +70,30 @@ void OpenInterface::handleOpCode(byte oc)
 #endif
   switch (oc)
   {
+
+     case(OC_POWER):
+     case(OC_SPOT):
+     case(OC_COVER):
+     case(OC_DEMO):
+     case(OC_LOW_SIDE_DRIVERS):
+     case(OC_LEDS):
+     case(OC_COVER_AND_DOCK):
+     case(OC_PWM_LOW_SIDE_DRIVERS):
+     case(OC_DIGITAL_OUTPUTS):
+     case(OC_STREAM):
+     case(OC_QUERY_LIST):
+     case(OC_PAUSE_RESUME_STREAM):
+     case(OC_SEND_IR):
+     case(OC_SCRIPT):
+     case(OC_PLAY_SCRIPT):
+     case(OC_SHOW_SCRIPT):
+     case(OC_WAIT_TIME):
+     case(OC_WAIT_DISTANCE):
+     case(OC_WAIT_ANGLE):
+     case(OC_WAIT_EVENT):
+       // To be implemented
+     break;
+
      case (OC_START):
        sensor[OI_SENSOR_OI_MODE] = OI_MODE_PASSIVE;
      break;
