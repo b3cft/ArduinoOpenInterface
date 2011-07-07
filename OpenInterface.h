@@ -71,6 +71,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #define OI_MODE_FULL    3
 
 // Sensors
+#define OI_SENSOR_WHEELDROPS_BUMPS  7
 #define OI_SENSOR_IR                17
 #define OI_SENSOR_BAT_VOLTAGE       22
 #define OI_SENSOR_BAT_CURRENT       23
@@ -82,6 +83,13 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #define OI_SENSOR_REQ_RADIUS        40
 #define OI_SENSOR_REQ_RIGHT_VEL     41
 #define OI_SENSOR_REQ_LEFT_VEL      42
+
+/// Masks wheedrops and bumps OI_SENSOR_REQ_WHEELDROPS_BUMPS (packet id 7)
+#define OI_MASK_BUMP_RIGHT  1
+#define OI_MASK_BUMP_LEFT   2
+#define OI_MASK_DROP_RIGHT  4
+#define OI_MASK_DROP_LEFT   8
+#define OI_MASK_DROP_CASTER 16
 
 // Other stuff
 #define READ_TIMEOUT 1000
@@ -99,21 +107,16 @@ typedef void (*song_callback)(uint8_t[]);
 class OpenInterface
 {
 private:
-	uint8_t OIMode;
+	/**
+	 * Sensors
+	 */
+	int sensorInt[42];
+	uint8_t sensor[42];
+  uint8_t songs[16][32];
 
-	uint8_t batteryTemperature;
-	int batteryVoltage;
-	int batteryCurrent;
-	int batteryCharge;
-	int batteryChargeEstimate;
-
-	int reqVelocity;
-	int reqRadius;
-	int reqLeftVelocity;
-	int reqRightVelocity;
-
-	uint8_t songs[16][32];
-
+	/**
+	 * Callbacks
+	 */
 	drivedirect_callback driveDirectCallback;
 	drive_callback driveCallback;
 	song_callback songCallback;
@@ -131,8 +134,6 @@ private:
 	void driveDirect();
 
 	bool readBytes(uint8_t*, uint8_t);
-
-	uint8_t getPacketId(uint8_t, uint8_t);
 
 	bool in_array(uint8_t, uint8_t*, uint8_t);
 
@@ -158,6 +159,12 @@ public:
 	void registerDriveDirect(drivedirect_callback f){driveDirectCallback = f;}
   void registerDrive(drive_callback f){driveCallback = f;}
   void registerSong(song_callback f){songCallback = f;}
+
+  /**
+   * Sensor information
+   */
+  void setSensorValue(uint8_t, uint8_t);
+  void setSensorValue(uint8_t, int);
 
   /**
    * Battery sensor information

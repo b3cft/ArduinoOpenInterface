@@ -25,7 +25,8 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 OpenInterface::OpenInterface()
 {
-  OIMode = OI_MODE_OFF;
+  sensor[OI_SENSOR_OI_MODE] = OI_MODE_OFF;
+  sensor[OI_SENSOR_IR]      = 255;
 }
 
 /**
@@ -70,7 +71,7 @@ void OpenInterface::handleOpCode(byte oc)
   switch (oc)
   {
      case (OC_START):
-       OIMode = OI_MODE_PASSIVE;
+       sensor[OI_SENSOR_OI_MODE] = OI_MODE_PASSIVE;
      break;
 
      case (OC_BAUD):
@@ -78,7 +79,7 @@ void OpenInterface::handleOpCode(byte oc)
 
      case (OC_CONTROL):
      case (OC_SAFE):
-       OIMode = OI_MODE_SAFE;
+       sensor[OI_SENSOR_OI_MODE] = OI_MODE_SAFE;
      break;
 
      case (OC_SENSORS):
@@ -98,7 +99,7 @@ void OpenInterface::handleOpCode(byte oc)
      break;
 
      case (OC_FULL):
-       OIMode = OI_MODE_FULL;
+       sensor[OI_SENSOR_OI_MODE] = OI_MODE_FULL;
      break;
   }
 }
@@ -127,101 +128,6 @@ bool OpenInterface::readBytes(uint8_t* bytesIn, uint8_t count)
 }
 
 /**
- * Return the sensor packet value
- */
-uint8_t OpenInterface::getPacketId(uint8_t id, uint8_t num=1)
-{
-  /**
-   * @todo Move sensors to definitions
-   */
-  switch(id)
-  {
-    case(OI_SENSOR_IR): // 255 = no signal
-      return 255;
-    break;
-
-    case(OI_SENSOR_BAT_VOLTAGE): // in mV
-      if (num==1) return (batteryVoltage & 0xff00) >> 8;
-      if (num==2) return (batteryVoltage & 0xff);
-    break;
-
-    case(OI_SENSOR_BAT_CURRENT): // mA
-      if (num==1) return (batteryCurrent & 0xff00) >> 8;
-      if (num==2) return (batteryCurrent & 0xff);
-    break;
-
-    case(OI_SENSOR_BAT_TEMPERATURE): // C
-      return batteryTemperature;
-    break;
-
-    case(OI_SENSOR_BAT_CHARGE): // mAh
-      if (num==1) return (batteryCharge & 0xff00) >> 8;
-      if (num==2) return (batteryCharge & 0xff);
-    break;
-
-    case(OI_SENSOR_BAT_CHARGE_REMAIN): // mAh
-      if (num==1) return (batteryChargeEstimate & 0xff00) >> 8;
-      if (num==2) return (batteryChargeEstimate & 0xff);
-    break;
-
-    case(OI_SENSOR_OI_MODE):
-      return OIMode;
-    break;
-
-    case(OI_SENSOR_REQ_VEL): //  mm/s -500 / 500
-      if (num==1) return (reqVelocity & 0xff00) >> 8;
-      if (num==2) return (reqVelocity & 0xff);
-    break;
-
-    case(OI_SENSOR_REQ_RADIUS):// mm
-      if (num==1) return (reqRadius & 0xff00) >> 8;
-      if (num==2) return (reqRadius & 0xff);
-    break;
-
-    case(OI_SENSOR_REQ_RIGHT_VEL): // mm/s -500/500
-      if (num==1) return (reqRightVelocity & 0xff00) >> 8;
-      if (num==2) return (reqRightVelocity & 0xff);
-    break;
-
-    case(OI_SENSOR_REQ_LEFT_VEL): // mm/s -500/500
-      if (num==1) return (reqLeftVelocity & 0xff00) >> 8;
-      if (num==2) return (reqLeftVelocity & 0xff);
-    break;
-
-    /*
-    These are sensors yet to be implemented
-    case(7):  // B 000, caster, l wheeldrop, r wheeldrop, bump l, bump r
-    case(8):  // wall sensor
-    case(9):  // left cliff
-    case(10): // left front cliff
-    case(11): // right front cliff
-    case(12): // right cliff
-    case(13): // virtual wall
-    case(14): // B 000. l wheel overcurrent, r wheel oc, LD2, LD1, LD0
-    case(18): // B 00000, advance, 0, play
-    case(19): // distance in mm travelled since last update. neg for backwards. Sum both wheels/2
-    case(19): // ^^ two bytes
-    case(20): // angle in degrees turned since last update, CCW positive, Clockwise neg. 2 bytes
-    case(21): // charging state
-    case(27): // Wall sensor stength. 2 bytes
-    case(28): // Cliff left stength. 2 bytes
-    case(29): // Cliff left front stength. 2 bytes
-    case(30): // Cliff right front stength. 2 bytes
-    case(31): // Cliff right stength. 2 bytes
-    case(32): // 000 device detect, DIO3, DIO2, DIO1, DIO0
-    case(33): // analog input 0-1023. 2 bytes
-    case(34): // charging sources
-    case(36): // current song
-    case(37): // song playing
-    case(38): // number of data stream packets
-    */
-    default:
-      return 0;
-    break;
-  }
-}
-
-/**
  * Helper function to return whether one int is contained within an array of ints
  */
 bool OpenInterface::in_array(uint8_t needle, uint8_t* haystack, uint8_t max)
@@ -240,32 +146,42 @@ bool OpenInterface::in_array(uint8_t needle, uint8_t* haystack, uint8_t max)
 
 void OpenInterface::setBatteryInfo(int voltage, int current, int charge, int chargeEstimate, uint8_t temperature)
 {
-  batteryVoltage        = voltage;
-  batteryCurrent        = current;
-  batteryCharge         = charge;
-  batteryChargeEstimate = chargeEstimate;
-  batteryTemperature    = temperature;
+  sensorInt[OI_SENSOR_BAT_VOLTAGE]       = voltage;
+  sensorInt[OI_SENSOR_BAT_CURRENT]       = current;
+  sensorInt[OI_SENSOR_BAT_CHARGE]        = charge;
+  sensorInt[OI_SENSOR_BAT_CHARGE_REMAIN] = chargeEstimate;
+  sensor[OI_SENSOR_BAT_TEMPERATURE]      = temperature;
 }
 void OpenInterface::updateBatteryVoltageCurrent(int voltage, int current)
 {
-  batteryVoltage = voltage;
-  batteryCurrent = current;
+  sensorInt[OI_SENSOR_BAT_VOLTAGE] = voltage;
+  sensorInt[OI_SENSOR_BAT_CURRENT] = current;
 }
 void OpenInterface::updateBatteryCurrent(int current)
 {
-  batteryCurrent = current;
+  sensorInt[OI_SENSOR_BAT_CURRENT] = current;
 }
 void OpenInterface::updateBatteryChargeEstimate(int chargeEstimate)
 {
-  batteryChargeEstimate = chargeEstimate;
+  sensorInt[OI_SENSOR_BAT_CHARGE_REMAIN] = chargeEstimate;
 }
 void OpenInterface::updateBatteryVoltage(int voltage)
 {
-  batteryVoltage = voltage;
+  sensorInt[OI_SENSOR_BAT_VOLTAGE] = voltage;
 }
 void OpenInterface::updateBatteryTemperature(uint8_t temperature)
 {
-  batteryTemperature = temperature;
+  sensor[OI_SENSOR_BAT_TEMPERATURE] = temperature;
+}
+
+void OpenInterface::setSensorValue(uint8_t sensorKey, uint8_t sensorValue)
+{
+  sensor[sensorKey] = sensorValue;
+}
+
+void OpenInterface::setSensorValue(uint8_t sensorKey, int sensorValue)
+{
+  sensorInt[sensorKey] = sensorValue;
 }
 
 /**
@@ -333,23 +249,27 @@ void OpenInterface::getSensors()
         sensorLen = (in_array(id[0], doublePackets, sizeof(doublePackets)/sizeof(uint8_t))) ? 2 : 1;
       break;
     }
-    byte sensor[sensorLen];
+    byte sensorData[sensorLen];
     uint8_t packet=0;
     for (uint8_t p=pStart ; p<=pStop ; p++)
     {
-#ifdef DEBUG_SERIAL
-      Serial.print("byte[");Serial.print(packet, DEC);Serial.print("] packet[");Serial.print(p, DEC);Serial.print("]: ");Serial.println(getPacketId(p), DEC);
-#endif
-      sensor[packet++] = getPacketId(p);
       if(in_array(p, doublePackets, sizeof(doublePackets)/sizeof(uint8_t)))
       {
 #ifdef DEBUG_SERIAL
-        Serial.print("byte[");Serial.print(packet, DEC);Serial.print("] packet[");Serial.print(p, DEC);Serial.print("]: ");Serial.println(getPacketId(p, 2), DEC);
+        Serial.print("byte[");Serial.print(packet, DEC);Serial.print("] packet[");Serial.print(p, DEC);Serial.print("]: ");Serial.println(sensorInt[p], HEX);
 #endif
-        sensor[packet++] = getPacketId(p, 2);
+        sensorData[packet++] = highByte(sensorInt[p]);
+        sensorData[packet++] = lowByte(sensorInt[p]);
+      }
+      else
+      {
+#ifdef DEBUG_SERIAL
+        Serial.print("byte[");Serial.print(packet, DEC);Serial.print("] packet[");Serial.print(p, DEC);Serial.print("]: ");Serial.println(sensor[p], HEX);
+#endif
+        sensorData[packet++] = sensor[p];
       }
     }
-    Serial.write(sensor, sensorLen);
+    Serial.write(sensorData, sensorLen);
 }
 
 /**
@@ -392,13 +312,13 @@ void OpenInterface::drive()
 
   if (result)
   {
-    reqVelocity      = int(word(raw[0], raw[1]));
-    reqRadius        = int(word(raw[2], raw[3]));
-    reqLeftVelocity  = 0;
-    reqRightVelocity = 0;
+    sensorInt[OI_SENSOR_REQ_VEL]       = int(word(raw[0], raw[1]));
+    sensorInt[OI_SENSOR_REQ_RADIUS]    = int(word(raw[2], raw[3]));
+    sensorInt[OI_SENSOR_REQ_LEFT_VEL]  = 0;
+    sensorInt[OI_SENSOR_REQ_RIGHT_VEL] = 0;
     if (driveCallback)
     {
-      (*driveCallback)(reqVelocity, reqRadius);
+      (*driveCallback)(sensorInt[OI_SENSOR_REQ_VEL], sensorInt[OI_SENSOR_REQ_RADIUS]);
     }
   }
 }
@@ -413,13 +333,13 @@ void OpenInterface::driveDirect()
 
   if (result)
   {
-    reqRightVelocity = int(word(raw[0], raw[1]));
-    reqLeftVelocity  = int(word(raw[2], raw[3]));
-    reqVelocity      = 0;
-    reqRadius        = 0;
+    sensorInt[OI_SENSOR_REQ_RIGHT_VEL] = int(word(raw[0], raw[1]));
+    sensorInt[OI_SENSOR_REQ_LEFT_VEL]  = int(word(raw[2], raw[3]));
+    sensorInt[OI_SENSOR_REQ_RADIUS]    = 0;
+    sensorInt[OI_SENSOR_REQ_VEL]       = 0;
     if (driveDirectCallback)
     {
-      (*driveDirectCallback)(reqLeftVelocity, reqRightVelocity);
+      (*driveDirectCallback)(sensorInt[OI_SENSOR_REQ_LEFT_VEL], sensorInt[OI_SENSOR_REQ_RIGHT_VEL]);
     }
   }
 }
