@@ -71,27 +71,43 @@ void OpenInterface::handleOpCode(byte oc)
   switch (oc)
   {
 
-     case(OC_POWER):
-     case(OC_SPOT):
-     case(OC_COVER):
-     case(OC_DEMO):
      case(OC_LOW_SIDE_DRIVERS):
      case(OC_LEDS):
-     case(OC_COVER_AND_DOCK):
      case(OC_PWM_LOW_SIDE_DRIVERS):
      case(OC_DIGITAL_OUTPUTS):
      case(OC_STREAM):
-     case(OC_QUERY_LIST):
      case(OC_PAUSE_RESUME_STREAM):
      case(OC_SEND_IR):
+
      case(OC_SCRIPT):
      case(OC_PLAY_SCRIPT):
      case(OC_SHOW_SCRIPT):
-     case(OC_WAIT_TIME):
-     case(OC_WAIT_DISTANCE):
-     case(OC_WAIT_ANGLE):
+
      case(OC_WAIT_EVENT):
        // To be implemented
+     break;
+
+     case(OC_WAIT_ANGLE):
+         waitAngle();
+     break;
+
+     case(OC_WAIT_DISTANCE):
+       waitDistance();
+     break;
+
+     case(OC_WAIT_TIME):
+       waitTime();
+     break;
+
+     case(OC_DEMO):
+     case(OC_SPOT):
+     case(OC_COVER):
+     case(OC_COVER_AND_DOCK):
+       // These are all demo codes. Implement?
+     break;
+
+     case(OC_QUERY_LIST):
+       queryList();
      break;
 
      case (OC_START):
@@ -152,16 +168,20 @@ bool OpenInterface::readBytes(uint8_t* bytesIn, uint8_t count)
 }
 
 /**
- * Helper function to return whether one int is contained within an array of ints
+ * Return true if the passed packet id is a double byte packet
  */
-bool OpenInterface::in_array(uint8_t needle, uint8_t* haystack, uint8_t max)
+bool OpenInterface::isDoublePacket(uint8_t packet)
 {
-    if (max==0) return false;
-
-    for(int i=0; i<max; i++)
-        if (haystack[i]==needle)
-            return true;
-    return false;
+  uint8_t max, doublePackets[] = {19,20,22,23,25,26,27,28,29,30,31,33,39,40,41,42};
+  max = sizeof(doublePackets);
+  for(int i=0; i<max; i++)
+  {
+    if (doublePackets[i]==packet)
+    {
+      return true;
+    }
+  }
+  return false;
 }
 
 /**
@@ -213,11 +233,59 @@ void OpenInterface::setSensorValue(uint8_t sensorKey, int sensorValue)
  */
 
 /**
+ * Handle wait angle Op Code
+ * @todo refactor this and wait distance into a single function
+ */
+void OpenInterface::waitAngle()
+{
+  uint8_t raw[2];
+  bool result = readBytes(raw, 2);
+  if (result)
+  {
+    int distance = int(word(raw[0], raw[1]));
+    if (waitAngleCallback)
+    {
+      (*waitAngleCallback)(distance);
+    }
+  }
+}
+
+/**
+ * Handle wait distance Op Code
+ * @todo refactor this and wait angle into a single function
+ */
+void OpenInterface::waitDistance()
+{
+  uint8_t raw[2];
+  bool result = readBytes(raw, 2);
+  if (result)
+  {
+    int distance = int(word(raw[0], raw[1]));
+    if (waitDistanceCallback)
+    {
+      (*waitDistanceCallback)(distance);
+    }
+  }
+}
+
+/**
+ * Handle wait time Op Code. Units of 15ms
+ */
+void OpenInterface::waitTime()
+{
+  uint8_t time[1];
+  bool result = readBytes(time, 1);
+  if (result)
+  {
+    delay(15*time[0]);
+  }
+}
+
+/**
  * Handle the sensors Op Code. Handles groups and individual sensors
  */
 void OpenInterface::getSensors()
 {
-    uint8_t doublePackets[] = {19,20,22,23,25,26,27,28,29,30,31,33,39,40,41,42};
     uint8_t id[1], pStart, pStop, sensorLen;
     char strId[3];
     readBytes(id, 1);
@@ -270,14 +338,14 @@ void OpenInterface::getSensors()
 
       default:
         pStart = pStop = id[0];
-        sensorLen = (in_array(id[0], doublePackets, sizeof(doublePackets)/sizeof(uint8_t))) ? 2 : 1;
+        sensorLen = (isDoublePacket(id[0])) ? 2 : 1;
       break;
     }
     byte sensorData[sensorLen];
     uint8_t packet=0;
     for (uint8_t p=pStart ; p<=pStop ; p++)
     {
-      if(in_array(p, doublePackets, sizeof(doublePackets)/sizeof(uint8_t)))
+      if(isDoublePacket(p))
       {
 #ifdef DEBUG_SERIAL
         Serial.print("byte[");Serial.print(packet, DEC);Serial.print("] packet[");Serial.print(p, DEC);Serial.print("]: ");Serial.println(sensorInt[p], HEX);
@@ -294,6 +362,35 @@ void OpenInterface::getSensors()
       }
     }
     Serial.write(sensorData, sensorLen);
+}
+
+/**
+ * Handle the query list Op Code. Return values of a request list of sensors
+ */
+void OpenInterface::queryList()
+{
+  uint8_t details[1];
+  bool result = readBytes(details, 1);
+  if (result)
+  {
+    uint8_t sensors[details[0]];
+    result = readBytes(sensors, details[0]);
+    if (result)
+    {
+      for (int i=0 ; i<details[0] ; i++)
+      {
+        if (isDoublePacket(i))
+        {
+          Serial.write(highByte(sensorInt[i]));
+          Serial.write(lowByte(sensorInt[i]));
+        }
+        else
+        {
+          Serial.write(sensor[i]);
+        }
+      }
+    }
+  }
 }
 
 /**
@@ -317,12 +414,9 @@ void OpenInterface::songPlay()
 {
   uint8_t details[1];
   bool result = readBytes(details, 1);
-  if (result)
+  if (result && songCallback)
   {
-    if (result && songCallback)
-    {
-      (*songCallback)(songs[details[0]]);
-    }
+    (*songCallback)(songs[details[0]]);
   }
 }
 

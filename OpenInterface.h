@@ -29,7 +29,6 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #define OC_CONTROL              0x82 //130
 #define OC_SAFE                 0x83 //131
 #define OC_FULL                 0x84 //132
-#define OC_POWER                0x85 //133
 #define OC_SPOT                 0x86 //134
 #define OC_COVER                0x87 //135
 #define OC_DEMO                 0x88 //136
@@ -99,10 +98,13 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 /**
  * Callback functions for user implemented features
+ * @todo refactor these to callbackWithInt, callbackWithTwoInts or something
  */
 typedef void (*drivedirect_callback)(int, int);
 typedef void (*drive_callback)(int, int);
 typedef void (*song_callback)(uint8_t[]);
+typedef void (*waitdistance_callback)(int);
+typedef void (*waitangle_callback)(int);
 
 class OpenInterface
 {
@@ -120,10 +122,14 @@ private:
 	drivedirect_callback driveDirectCallback;
 	drive_callback driveCallback;
 	song_callback songCallback;
+	waitdistance_callback waitDistanceCallback;
+	waitangle_callback waitAngleCallback;
 
 	void handleOpCode(byte);
 
 	void getSensors();
+
+	void queryList();
 
 	void song();
 
@@ -133,9 +139,15 @@ private:
 
 	void driveDirect();
 
+	void waitTime();
+
+	void waitDistance();
+
+	void waitAngle();
+
 	bool readBytes(uint8_t*, uint8_t);
 
-	bool in_array(uint8_t, uint8_t*, uint8_t);
+	bool isDoublePacket(uint8_t packet);
 
 public:
 	/**
@@ -159,6 +171,8 @@ public:
 	void registerDriveDirect(drivedirect_callback f){driveDirectCallback = f;}
   void registerDrive(drive_callback f){driveCallback = f;}
   void registerSong(song_callback f){songCallback = f;}
+  void registerWaitDistance(waitdistance_callback f){waitDistanceCallback = f;}
+  void registerWaitAngle(waitangle_callback f){waitAngleCallback = f;}
 
   /**
    * Sensor information

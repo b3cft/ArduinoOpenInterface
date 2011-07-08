@@ -56,6 +56,14 @@ void drive(int velocity, int radius)
   Serial.print("Radius:");Serial.println(radius,DEC);
 }
 
+/**
+ * Callback function to handle a call to wait distance
+ */
+void driveDistance(int distance)
+{
+  // Put your method for travelling a certain distance here.
+}
+
 void loop()
 {
   /**
