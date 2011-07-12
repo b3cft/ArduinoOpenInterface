@@ -88,11 +88,17 @@ void OpenInterface::handleOpCode(byte oc)
      break;
 
      case(OC_WAIT_ANGLE):
-         waitAngle();
+         if (waitAngleCallback)
+         {
+           waitAction(waitAngleCallback);
+         }
      break;
 
      case(OC_WAIT_DISTANCE):
-       waitDistance();
+         if (waitDistanceCallback)
+         {
+           waitAction(waitDistanceCallback);
+         }
      break;
 
      case(OC_WAIT_TIME):
@@ -233,38 +239,16 @@ void OpenInterface::setSensorValue(uint8_t sensorKey, int sensorValue)
  */
 
 /**
- * Handle wait angle Op Code
- * @todo refactor this and wait distance into a single function
+ * Handle wait callback that accepts a single int, e.g. waitAngle, waitDistance
  */
-void OpenInterface::waitAngle()
+void OpenInterface::waitAction(callbackWithOneInt action)
 {
   uint8_t raw[2];
   bool result = readBytes(raw, 2);
   if (result)
   {
     int distance = int(word(raw[0], raw[1]));
-    if (waitAngleCallback)
-    {
-      (*waitAngleCallback)(distance);
-    }
-  }
-}
-
-/**
- * Handle wait distance Op Code
- * @todo refactor this and wait angle into a single function
- */
-void OpenInterface::waitDistance()
-{
-  uint8_t raw[2];
-  bool result = readBytes(raw, 2);
-  if (result)
-  {
-    int distance = int(word(raw[0], raw[1]));
-    if (waitDistanceCallback)
-    {
-      (*waitDistanceCallback)(distance);
-    }
+    (*action)(distance);
   }
 }
 

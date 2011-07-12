@@ -135,11 +135,9 @@ private:
 
   void driveDirect();
 
+  void waitAction(callbackWithOneInt);
+
   void waitTime();
-
-  void waitDistance();
-
-  void waitAngle();
 
   bool readBytes(uint8_t*, uint8_t);
 
