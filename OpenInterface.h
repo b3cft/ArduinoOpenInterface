@@ -1,25 +1,25 @@
 /*
-Copyright (c) 2011 Andy "Bob" Brockhurst
+ Copyright (c) 2011 Andy "Bob" Brockhurst
 
-Permission is hereby granted, free of charge, to any person obtaining
-a copy of this software and associated documentation files (the
-"Software"), to deal in the Software without restriction, including
-without limitation the rights to use, copy, modify, merge, publish,
-distribute, sublicense, and/or sell copies of the Software, and to
-permit persons to whom the Software is furnished to do so, subject to
-the following conditions:
+ Permission is hereby granted, free of charge, to any person obtaining
+ a copy of this software and associated documentation files (the
+ "Software"), to deal in the Software without restriction, including
+ without limitation the rights to use, copy, modify, merge, publish,
+ distribute, sublicense, and/or sell copies of the Software, and to
+ permit persons to whom the Software is furnished to do so, subject to
+ the following conditions:
 
-The above copyright notice and this permission notice shall be
-included in all copies or substantial portions of the Software.
+ The above copyright notice and this permission notice shall be
+ included in all copies or substantial portions of the Software.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
-NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
-LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
-OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
-WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-*/
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+ LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+ OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ */
 #ifndef OpenInterface_h
 #define OpenInterface_h
 
@@ -53,7 +53,6 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #define OC_WAIT_DISTANCE        0x9c //156
 #define OC_WAIT_ANGLE           0x9d //157
 #define OC_WAIT_EVENT           0x9e //158
-
 // Sensor Packet Groups
 #define PACKET_GRP_7_26   0
 #define PACKET_GRP_7_16   1
@@ -98,81 +97,78 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 /**
  * Callback functions for user implemented features
- * @todo refactor these to callbackWithInt, callbackWithTwoInts or something
  */
-typedef void (*drivedirect_callback)(int, int);
-typedef void (*drive_callback)(int, int);
-typedef void (*song_callback)(uint8_t[]);
-typedef void (*waitdistance_callback)(int);
-typedef void (*waitangle_callback)(int);
+typedef void (*callbackWithOneInt)(int);
+typedef void (*callbackWithTwoInts)(int, int);
+typedef void (*callbackWithByteArr)(uint8_t[]);
 
 class OpenInterface
 {
 private:
-	/**
-	 * Sensors
-	 */
-	int sensorInt[42];
-	uint8_t sensor[42];
+  /**
+   * Sensors
+   */
+  int     sensorInt[42];
+  uint8_t sensor[42];
   uint8_t songs[16][32];
 
-	/**
-	 * Callbacks
-	 */
-	drivedirect_callback driveDirectCallback;
-	drive_callback driveCallback;
-	song_callback songCallback;
-	waitdistance_callback waitDistanceCallback;
-	waitangle_callback waitAngleCallback;
+  /**
+   * Callbacks
+   */
+  callbackWithTwoInts driveDirectCallback;
+  callbackWithTwoInts driveCallback;
+  callbackWithByteArr songCallback;
+  callbackWithOneInt  waitDistanceCallback;
+  callbackWithOneInt  waitAngleCallback;
 
-	void handleOpCode(byte);
+  void handleOpCode(byte);
 
-	void getSensors();
+  void getSensors();
 
-	void queryList();
+  void queryList();
 
-	void song();
+  void song();
 
-	void songPlay();
+  void songPlay();
 
-	void drive();
+  void drive();
 
-	void driveDirect();
+  void driveDirect();
 
-	void waitTime();
+  void waitTime();
 
-	void waitDistance();
+  void waitDistance();
 
-	void waitAngle();
+  void waitAngle();
 
-	bool readBytes(uint8_t*, uint8_t);
+  bool readBytes(uint8_t*, uint8_t);
 
-	bool isDoublePacket(uint8_t packet);
+  bool isDoublePacket(uint8_t packet);
 
 public:
-	/**
-	 * Constructor
-	 */
-	OpenInterface();
+  /**
+   * Constructor
+   */
+  OpenInterface();
 
-	/**
-	 * Initialise interface
-	 */
-	void init(long);
+  /**
+   * Initialise interface
+   */
+  void init(long);
 
-	/**
-	 * Main loop
-	 */
-	void handle();
+  /**
+   * Main loop
+   */
+  void handle();
 
-	/**
-	 * Register callbacks for user implemented features
-	 */
-	void registerDriveDirect(drivedirect_callback f){driveDirectCallback = f;}
-  void registerDrive(drive_callback f){driveCallback = f;}
-  void registerSong(song_callback f){songCallback = f;}
-  void registerWaitDistance(waitdistance_callback f){waitDistanceCallback = f;}
-  void registerWaitAngle(waitangle_callback f){waitAngleCallback = f;}
+  /**
+   * Register callbacks for user implemented features
+   */
+  void registerDriveDirect(callbackWithTwoInts f) {driveDirectCallback = f;}
+  void registerDrive(callbackWithTwoInts f) {driveCallback = f;}
+  void registerSong(callbackWithByteArr f) {songCallback = f;}
+  void registerWaitDistance(callbackWithOneInt f) {waitDistanceCallback = f;}
+  void registerWaitAngle(callbackWithOneInt f) {waitAngleCallback = f;}
 
   /**
    * Sensor information
