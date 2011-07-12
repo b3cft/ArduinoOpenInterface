@@ -112,6 +112,8 @@ private:
   uint8_t sensor[42];
   uint8_t songs[16][32];
 
+  HardwareSerial* serial;
+
   /**
    * Callbacks
    */
@@ -147,7 +149,7 @@ public:
   /**
    * Constructor
    */
-  OpenInterface();
+  OpenInterface(HardwareSerial* serialPort = &Serial);
 
   /**
    * Initialise interface

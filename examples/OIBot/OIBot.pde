@@ -1,7 +1,7 @@
 #include <OpenInterface.h>
 
 // Create an instance of the
-OpenInterface oi;
+OpenInterface oi(&Serial);
 
 //variables for the battery data
 int batVoltage=6000, batCurrent=-250, batRemain=4500, batCharge=4500;

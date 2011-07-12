@@ -23,8 +23,9 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include "OpenInterface.h"
 //#define DEBUG_SERIAL
 
-OpenInterface::OpenInterface()
+OpenInterface::OpenInterface(HardwareSerial* serialPort)
 {
+  serial = serialPort;
   sensor[OI_SENSOR_OI_MODE] = OI_MODE_OFF;
   sensor[OI_SENSOR_IR]      = 255;
 }
@@ -35,7 +36,7 @@ OpenInterface::OpenInterface()
  */
 void OpenInterface::init(long speed)
 {
-  Serial.begin(speed);
+  serial->begin(speed);
 }
 
 /**
@@ -43,9 +44,9 @@ void OpenInterface::init(long speed)
  */
 void OpenInterface::handle()
 {
-  if (Serial.available())
+  if (serial->available())
   {
-    handleOpCode(Serial.read());
+    handleOpCode(serial->read());
   }
 }
 
@@ -158,17 +159,17 @@ bool OpenInterface::readBytes(uint8_t* bytesIn, uint8_t count)
   while (count-- > 0)
   {
     unsigned long start = millis();
-    while(!Serial.available())
+    while(!serial->available())
     {
       if (millis() > start + READ_TIMEOUT)
       {
 #ifdef DEBUG_SERIAL
-      Serial.println("Timeout");
+      serial->println("Timeout");
 #endif
         return false;
       }
     }
-    *bytesIn++ = Serial.read();
+    *bytesIn++ = serial->read();
   }
   return true;
 }
@@ -332,7 +333,7 @@ void OpenInterface::getSensors()
       if(isDoublePacket(p))
       {
 #ifdef DEBUG_SERIAL
-        Serial.print("byte[");Serial.print(packet, DEC);Serial.print("] packet[");Serial.print(p, DEC);Serial.print("]: ");Serial.println(sensorInt[p], HEX);
+        serial->print("byte[");serial->print(packet, DEC);serial->print("] packet[");serial->print(p, DEC);serial->print("]: ");serial->println(sensorInt[p], HEX);
 #endif
         sensorData[packet++] = highByte(sensorInt[p]);
         sensorData[packet++] = lowByte(sensorInt[p]);
@@ -340,12 +341,12 @@ void OpenInterface::getSensors()
       else
       {
 #ifdef DEBUG_SERIAL
-        Serial.print("byte[");Serial.print(packet, DEC);Serial.print("] packet[");Serial.print(p, DEC);Serial.print("]: ");Serial.println(sensor[p], HEX);
+        serial->print("byte[");serial->print(packet, DEC);serial->print("] packet[");serial->print(p, DEC);serial->print("]: ");serial->println(sensor[p], HEX);
 #endif
         sensorData[packet++] = sensor[p];
       }
     }
-    Serial.write(sensorData, sensorLen);
+    serial->write(sensorData, sensorLen);
 }
 
 /**
@@ -365,12 +366,12 @@ void OpenInterface::queryList()
       {
         if (isDoublePacket(i))
         {
-          Serial.write(highByte(sensorInt[i]));
-          Serial.write(lowByte(sensorInt[i]));
+          serial->write(highByte(sensorInt[i]));
+          serial->write(lowByte(sensorInt[i]));
         }
         else
         {
-          Serial.write(sensor[i]);
+          serial->write(sensor[i]);
         }
       }
     }
