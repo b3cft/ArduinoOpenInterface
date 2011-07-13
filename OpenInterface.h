@@ -111,6 +111,7 @@ private:
   int     sensorInt[42];
   uint8_t sensor[42];
   uint8_t songs[16][32];
+  uint8_t script[256];
 
   HardwareSerial* serial;
 
@@ -129,6 +130,8 @@ private:
 
   void queryList();
 
+  void scriptSet();
+
   void song();
 
   void songPlay();
@@ -143,7 +146,11 @@ private:
 
   bool readBytes(uint8_t*, uint8_t);
 
+  bool readByte(uint8_t*);
+
   bool isDoublePacket(uint8_t packet);
+
+  uint8_t opCodeDataLen(uint8_t opCode);
 
 public:
   /**

@@ -83,6 +83,7 @@ void OpenInterface::handleOpCode(byte oc)
      case(OC_SCRIPT):
      case(OC_PLAY_SCRIPT):
      case(OC_SHOW_SCRIPT):
+     case(OC_PLAY_SONG):
 
      case(OC_WAIT_EVENT):
        // To be implemented
@@ -175,6 +176,25 @@ bool OpenInterface::readBytes(uint8_t* bytesIn, uint8_t count)
 }
 
 /**
+ * Helper function to read a single byte from serial interface with a timeout
+ */
+bool OpenInterface::readByte(uint8_t* byteIn)
+{
+  unsigned long start = millis();
+  while(!serial->available())
+  {
+    if (millis() > start + READ_TIMEOUT)
+    {
+#ifdef DEBUG_SERIAL
+    serial->println("Timeout");
+#endif
+      return false;
+    }
+  }
+  *byteIn = serial->read();
+  return true;
+}
+/**
  * Return true if the passed packet id is a double byte packet
  */
 bool OpenInterface::isDoublePacket(uint8_t packet)
@@ -189,6 +209,59 @@ bool OpenInterface::isDoublePacket(uint8_t packet)
     }
   }
   return false;
+}
+
+uint8_t OpenInterface::opCodeDataLen(uint8_t opCode)
+{
+  switch(opCode)
+  {
+    case (OC_DIRECT_DRIVE):
+    case (OC_DRIVE):
+      return 4;
+    break;
+
+    case (OC_LEDS):
+    case (OC_PWM_LOW_SIDE_DRIVERS):
+      return 3;
+    break;
+
+    case (OC_WAIT_ANGLE):
+    case (OC_WAIT_DISTANCE):
+      return 2;
+    break;
+
+    case (OC_DEMO):
+    case (OC_BAUD):
+    case (OC_SPOT):
+    case (OC_COVER):
+    case (OC_COVER_AND_DOCK):
+    case (OC_LOW_SIDE_DRIVERS):
+    case (OC_DIGITAL_OUTPUTS):
+    case (OC_SEND_IR):
+    case (OC_PLAY_SONG):
+    case (OC_SENSORS):
+    case (OC_PAUSE_RESUME_STREAM):
+    case (OC_WAIT_TIME):
+    case (OC_WAIT_EVENT):
+      return 1;
+    break;
+
+    case (OC_SAFE):
+    case (OC_START):
+    case (OC_CONTROL):
+    case (OC_FULL):
+    case (OC_PLAY_SCRIPT):
+    case (OC_SHOW_SCRIPT):
+      return 0;
+    break;
+
+    case (OC_SONG):
+    case (OC_QUERY_LIST):
+    case (OC_STREAM):
+    case (OC_SCRIPT):
+      return false;
+    break;
+  }
 }
 
 /**
@@ -372,6 +445,35 @@ void OpenInterface::queryList()
         else
         {
           serial->write(sensor[i]);
+        }
+      }
+    }
+  }
+}
+
+void OpenInterface::scriptSet()
+{
+  uint8_t commands;
+  bool result = readByte(&commands);
+  if (result)
+  {
+    uint8_t scriptPos=0;
+    for (int i=0; i<commands; i++)
+    {
+      uint8_t opCode;
+      result = readByte(&opCode);
+      if (result)
+      {
+        script[scriptPos++] = opCode;
+        uint8_t opLen = opCodeDataLen(opCode);
+        for (int j=0; j<opLen; j++)
+        {
+          uint8_t opData;
+          result = readByte(&opData);
+          if (result)
+          {
+            script[scriptPos++] = opData;
+          }
         }
       }
     }
