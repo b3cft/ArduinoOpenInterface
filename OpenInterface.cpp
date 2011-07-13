@@ -83,7 +83,6 @@ void OpenInterface::handleOpCode(byte oc)
      case(OC_SCRIPT):
      case(OC_PLAY_SCRIPT):
      case(OC_SHOW_SCRIPT):
-     case(OC_PLAY_SONG):
 
      case(OC_WAIT_EVENT):
        // To be implemented
@@ -136,6 +135,10 @@ void OpenInterface::handleOpCode(byte oc)
 
      case (OC_SONG):
        song();
+     break;
+
+     case(OC_PLAY_SONG):
+       songPlay();
      break;
 
      case (OC_DIRECT_DRIVE):
@@ -451,6 +454,9 @@ void OpenInterface::queryList()
   }
 }
 
+/**
+ * Handle recording a script of Op Codes being sent
+ */
 void OpenInterface::scriptSet()
 {
   uint8_t commands;
