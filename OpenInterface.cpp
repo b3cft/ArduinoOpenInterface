@@ -469,7 +469,16 @@ void OpenInterface::scriptSet()
   bool result = readByte(&commands);
   if (result)
   {
-    uint8_t scriptPos=0;
+    if (commands == 0x00)
+    {
+      for (int i=0; i<sizeof(script); i++)
+      {
+        script[i] = 0x00;
+      }
+      return;
+    }
+    script[0] = commands;
+    uint8_t scriptPos=1;
     for (int i=0; i<commands; i++)
     {
       uint8_t opCode;
