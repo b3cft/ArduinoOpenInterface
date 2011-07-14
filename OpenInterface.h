@@ -132,6 +132,8 @@ private:
 
   void scriptSet();
 
+  void scriptPlay();
+
   void song();
 
   void songPlay();

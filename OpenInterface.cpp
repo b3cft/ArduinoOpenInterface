@@ -80,12 +80,18 @@ void OpenInterface::handleOpCode(byte oc)
      case(OC_PAUSE_RESUME_STREAM):
      case(OC_SEND_IR):
 
-     case(OC_SCRIPT):
-     case(OC_PLAY_SCRIPT):
      case(OC_SHOW_SCRIPT):
 
      case(OC_WAIT_EVENT):
        // To be implemented
+     break;
+
+     case(OC_PLAY_SCRIPT):
+        scriptPlay();
+     break;
+
+     case(OC_SCRIPT):
+       scriptSet();
      break;
 
      case(OC_WAIT_ANGLE):
@@ -179,7 +185,7 @@ bool OpenInterface::readBytes(uint8_t* bytesIn, uint8_t count)
 }
 
 /**
- * Helper function to read a single byte from serial interface with a timeout
+ * Helper function to read a specified number of bytes from serial interface with a timeout
  */
 bool OpenInterface::readByte(uint8_t* byteIn)
 {
@@ -484,6 +490,11 @@ void OpenInterface::scriptSet()
       }
     }
   }
+}
+
+void OpenInterface::scriptPlay()
+{
+
 }
 
 /**
