@@ -478,14 +478,13 @@ void OpenInterface::scriptSet()
       return;
     }
     script[0] = commands;
-    uint8_t scriptPos=1;
-    for (int i=0; i<commands; i++)
+    for (int i=1; i<commands; i++)
     {
       uint8_t opCode;
       result = readByte(&opCode);
       if (result)
       {
-        script[scriptPos++] = opCode;
+        script[i++] = opCode;
         uint8_t opLen = opCodeDataLen(opCode);
         for (int j=0; j<opLen; j++)
         {
@@ -493,7 +492,7 @@ void OpenInterface::scriptSet()
           result = readByte(&opData);
           if (result)
           {
-            script[scriptPos++] = opData;
+            script[i++] = opData;
           }
         }
       }
@@ -501,9 +500,89 @@ void OpenInterface::scriptSet()
   }
 }
 
+/**
+ * Loop through the script array and action the requests
+ */
 void OpenInterface::scriptPlay()
 {
+  uint8_t scriptLen = script[0];
+  for (int i=1; i<scriptLen; i++)
+  {
+    switch(script[i])
+    {
+      case (OC_PLAY_SCRIPT):
+          // restart the script. i.e. play for ever!
+          i=1;
+      break;
 
+      case (OC_PWM_LOW_SIDE_DRIVERS):
+        if (controlLsdPwmCallback)
+        {
+          (*controlLsdPwmCallback)(script[i++], script[i++], script[i++]);
+        }
+      break;
+
+      case (OC_LEDS):
+        if (controlLedsCallback)
+        {
+          (*controlLedsCallback)(script[i++], script[i++], script[i++]);
+        }
+      break;
+
+      case (OC_WAIT_ANGLE):
+        if (waitAngleCallback)
+        {
+          (*waitAngleCallback)(int(word(script[i++],script[i++])));
+        }
+      break;
+
+      case (OC_WAIT_DISTANCE):
+        if (waitDistanceCallback)
+        {
+          (*waitDistanceCallback)(int(word(script[i++],script[i++])));
+        }
+      break;
+
+      case (OC_LOW_SIDE_DRIVERS):
+        if (controlLsdOutputCallback)
+        {
+          (*controlLsdOutputCallback)(script[i++]);
+        }
+      break;
+
+      case (OC_DIGITAL_OUTPUTS):
+        if (controlDigitalOutputCallback)
+        {
+          (*controlDigitalOutputCallback)(script[i++]);
+        }
+      break;
+
+      case (OC_SEND_IR):
+        if (sendIrCallback)
+        {
+          (*sendIrCallback)(script[i++]);
+        }
+      break;
+
+      case (OC_PLAY_SONG):
+        if (songCallback)
+        {
+          (*songCallback)(songs[script[i++]]);
+        }
+      break;
+
+      case (OC_WAIT_TIME):
+        delay(script[i++]*15);
+      break;
+
+      case (OC_WAIT_EVENT):
+        if (waitEventCallback)
+        {
+          (*waitEventCallback)(script[i++]);
+        }
+      break;
+    }
+  }
 }
 
 /**

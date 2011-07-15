@@ -101,6 +101,8 @@
 typedef void (*callbackWithOneInt)(int);
 typedef void (*callbackWithTwoInts)(int, int);
 typedef void (*callbackWithByteArr)(uint8_t[]);
+typedef void (*callbackWithOneByte)(uint8_t);
+typedef void (*callbackWithThreeBytes)(uint8_t, uint8_t, uint8_t);
 
 class OpenInterface
 {
@@ -111,18 +113,24 @@ private:
   int     sensorInt[42];
   uint8_t sensor[42];
   uint8_t songs[16][32];
-  uint8_t script[256];
+  uint8_t script[101]; //max 100 command length + 1 for storing the length
 
   HardwareSerial* serial;
 
   /**
    * Callbacks
    */
-  callbackWithTwoInts driveDirectCallback;
-  callbackWithTwoInts driveCallback;
-  callbackWithByteArr songCallback;
-  callbackWithOneInt  waitDistanceCallback;
-  callbackWithOneInt  waitAngleCallback;
+  callbackWithTwoInts    driveDirectCallback;
+  callbackWithTwoInts    driveCallback;
+  callbackWithByteArr    songCallback;
+  callbackWithOneInt     waitDistanceCallback;
+  callbackWithOneInt     waitAngleCallback;
+  callbackWithOneByte    waitEventCallback;
+  callbackWithOneByte    controlLsdOutputCallback;
+  callbackWithOneByte    controlDigitalOutputCallback;
+  callbackWithOneByte    sendIrCallback;
+  callbackWithThreeBytes controlLedsCallback;
+  callbackWithThreeBytes controlLsdPwmCallback;
 
   void handleOpCode(byte);
 
@@ -178,7 +186,12 @@ public:
   void registerSong(callbackWithByteArr f) {songCallback = f;}
   void registerWaitDistance(callbackWithOneInt f) {waitDistanceCallback = f;}
   void registerWaitAngle(callbackWithOneInt f) {waitAngleCallback = f;}
-
+  void registerWaitEvent(callbackWithOneByte f) {waitEventCallback = f;}
+  void registerLedControl(callbackWithThreeBytes f) {controlLedsCallback = f;}
+  void registerLsdPwmControl(callbackWithThreeBytes f) {controlLsdPwmCallback = f;}
+  void registerLsdOutputCallback(callbackWithOneByte f) {controlLsdOutputCallback = f;}
+  void registerDigitalOutputCallback(callbackWithOneByte f) {controlDigitalOutputCallback = f;}
+  void registerSendIrCallback(callbackWithOneByte f) {sendIrCallback = f;}
   /**
    * Sensor information
    */
