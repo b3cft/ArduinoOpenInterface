@@ -8,11 +8,11 @@ Then this libary is for *you*.
 This code allows an Arduino to use the iRobot Open Interface and respond as if it is a Roomba/Create robot.
 
 *To install:*
- * click DOWNLOAD SOURCE from the top right corner.
- * unpack the download.
- * in your sketches folder create a "libraries" folder if one doesn't exist.
- * copy the unpacked OpenInterface folder into that "libraries".
- * restart the the Arduino IDE, you should now see OpenInterface under the examples "File/Examples" menu.  
+* click DOWNLOAD SOURCE from the top right corner.
+* unpack the download.
+* in your sketches folder create a "libraries" folder if one doesn't exist.
+* copy the unpacked OpenInterface folder into that "libraries".
+* restart the the Arduino IDE, you should now see OpenInterface under the examples "File/Examples" menu.  
  
 Look at the example, OIBot.
 
