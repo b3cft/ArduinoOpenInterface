@@ -17,7 +17,7 @@ Installing
 * unpack the download.
 * in your sketches folder create a "libraries" folder if one doesn't exist.
 * copy the unpacked OpenInterface folder into that "libraries".
-* restart the the Arduino IDE, you should now see OpenInterface under the examples "File/Examples" menu.  
+* restart the the Arduino IDE, you should now see OpenInterface under the "File/Examples" menu.  
  
 Look at the example, OIBot.
 
