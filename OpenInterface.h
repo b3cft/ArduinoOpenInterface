@@ -138,6 +138,22 @@ private:
 
   void queryList();
 
+  void lowSideDrivers();
+
+  void leds();
+
+  void pwmLowSideDrivers();
+
+  void digitalOutputs();
+
+  void stream();
+
+  void sendIr();
+
+  void showScript();
+
+  void waitEvent();
+
   void scriptSet();
 
   void scriptPlay();

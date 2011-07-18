@@ -73,17 +73,38 @@ void OpenInterface::handleOpCode(byte oc)
   {
 
      case(OC_LOW_SIDE_DRIVERS):
+       lowSideDrivers();
+     break;
+
      case(OC_LEDS):
+       leds();
+     break;
+
      case(OC_PWM_LOW_SIDE_DRIVERS):
+       pwmLowSideDrivers();
+     break;
+
      case(OC_DIGITAL_OUTPUTS):
+       digitalOutputs();
+     break;
+
      case(OC_STREAM):
+         stream();
+     break;
+
      case(OC_PAUSE_RESUME_STREAM):
+     break;
+
      case(OC_SEND_IR):
+         sendIr();
+     break;
 
      case(OC_SHOW_SCRIPT):
+       showScript();
+     break;
 
      case(OC_WAIT_EVENT):
-       // To be implemented
+       waitEvent();
      break;
 
      case(OC_PLAY_SCRIPT):
@@ -340,11 +361,11 @@ void OpenInterface::waitAction(callbackWithOneInt action)
  */
 void OpenInterface::waitTime()
 {
-  uint8_t time[1];
-  bool result = readBytes(time, 1);
+  uint8_t time;
+  bool result = readByte(&time);
   if (result)
   {
-    delay(15*time[0]);
+    delay(15*time);
   }
 }
 
@@ -457,6 +478,88 @@ void OpenInterface::queryList()
         }
       }
     }
+  }
+}
+
+/**
+ * Handle switching low side drivers on and off
+ */
+void OpenInterface::lowSideDrivers()
+{
+  uint8_t status;
+  bool result = readByte(&status);
+  if (result && controlLsdOutputCallback)
+  {
+    (*controlLsdOutputCallback)(status);
+  }
+}
+
+/**
+ * Handle controlling LEDs
+ */
+void OpenInterface::leds()
+{
+  uint8_t status[3];
+  bool result = readBytes(status, 3);
+  if (result && controlLedsCallback)
+  {
+    (*controlLedsCallback)(status[0], status[1], status[2]);
+  }
+}
+
+/**
+ * Handle altering the PWM values for low side drivers
+ */
+void OpenInterface::pwmLowSideDrivers()
+{
+  uint8_t status[3];
+  bool result = readBytes(status, 3);
+  if (result && controlLsdPwmCallback)
+  {
+    (*controlLsdPwmCallback)(status[0], status[1], status[2]);
+  }
+}
+
+/**
+ * Handle manipulating the Digital Outputs
+ */
+void OpenInterface::digitalOutputs()
+{
+  uint8_t status;
+  bool result = readByte(&status);
+  if (result && controlDigitalOutputCallback)
+  {
+    (*controlDigitalOutputCallback)(status);
+  }
+}
+
+void OpenInterface::stream()
+{
+
+}
+
+void OpenInterface::sendIr()
+{
+  uint8_t status;
+  bool result = readByte(&status);
+  if (result && sendIrCallback)
+  {
+    (*sendIrCallback)(status);
+  }
+}
+
+void OpenInterface::showScript()
+{
+
+}
+
+void OpenInterface::waitEvent()
+{
+  uint8_t status;
+  bool result = readByte(&status);
+  if (result && waitEventCallback)
+  {
+    (*waitEventCallback)(status);
   }
 }
 
