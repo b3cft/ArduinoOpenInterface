@@ -73,19 +73,19 @@ void OpenInterface::handleOpCode(byte oc)
   {
 
      case(OC_LOW_SIDE_DRIVERS):
-       lowSideDrivers();
+       callCallbackWithOneByte(controlLsdOutputCallback);
      break;
 
      case(OC_LEDS):
-       leds();
+       callCallbackWithThreeBytes(controlLedsCallback);
      break;
 
      case(OC_PWM_LOW_SIDE_DRIVERS):
-       pwmLowSideDrivers();
+       callCallbackWithThreeBytes(controlLsdPwmCallback);
      break;
 
      case(OC_DIGITAL_OUTPUTS):
-       digitalOutputs();
+       callCallbackWithOneByte(controlDigitalOutputCallback);
      break;
 
      case(OC_STREAM):
@@ -96,7 +96,7 @@ void OpenInterface::handleOpCode(byte oc)
      break;
 
      case(OC_SEND_IR):
-         sendIr();
+       callCallbackWithOneByte(sendIrCallback);
      break;
 
      case(OC_SHOW_SCRIPT):
@@ -104,7 +104,7 @@ void OpenInterface::handleOpCode(byte oc)
      break;
 
      case(OC_WAIT_EVENT):
-       waitEvent();
+       callCallbackWithOneByte(waitEventCallback);
      break;
 
      case(OC_PLAY_SCRIPT):
@@ -241,6 +241,9 @@ bool OpenInterface::isDoublePacket(uint8_t packet)
   return false;
 }
 
+/**
+ * Return the number of bytes the opcode should read from the serial interface
+ */
 uint8_t OpenInterface::opCodeDataLen(uint8_t opCode)
 {
   switch(opCode)
@@ -298,6 +301,9 @@ uint8_t OpenInterface::opCodeDataLen(uint8_t opCode)
  * ************ Sensor Interactions ****************
  */
 
+/**
+ * Helper function to set battery information for sensor return
+ */
 void OpenInterface::setBatteryInfo(int voltage, int current, int charge, int chargeEstimate, uint8_t temperature)
 {
   sensorInt[OI_SENSOR_BAT_VOLTAGE]       = voltage;
@@ -306,33 +312,59 @@ void OpenInterface::setBatteryInfo(int voltage, int current, int charge, int cha
   sensorInt[OI_SENSOR_BAT_CHARGE_REMAIN] = chargeEstimate;
   sensor[OI_SENSOR_BAT_TEMPERATURE]      = temperature;
 }
+
+/**
+ * Helper function to set battery information for sensor return
+ */
 void OpenInterface::updateBatteryVoltageCurrent(int voltage, int current)
 {
   sensorInt[OI_SENSOR_BAT_VOLTAGE] = voltage;
   sensorInt[OI_SENSOR_BAT_CURRENT] = current;
 }
+
+/**
+ * Helper function to set battery information for sensor return
+ */
 void OpenInterface::updateBatteryCurrent(int current)
 {
   sensorInt[OI_SENSOR_BAT_CURRENT] = current;
 }
+
+/**
+ * Helper function to set battery information for sensor return
+ */
 void OpenInterface::updateBatteryChargeEstimate(int chargeEstimate)
 {
   sensorInt[OI_SENSOR_BAT_CHARGE_REMAIN] = chargeEstimate;
 }
+
+/**
+ * Helper function to set battery information for sensor return
+ */
 void OpenInterface::updateBatteryVoltage(int voltage)
 {
   sensorInt[OI_SENSOR_BAT_VOLTAGE] = voltage;
 }
+
+/**
+ * Helper function to set battery information for sensor return
+ */
 void OpenInterface::updateBatteryTemperature(uint8_t temperature)
 {
   sensor[OI_SENSOR_BAT_TEMPERATURE] = temperature;
 }
 
+/**
+ * Set a value of a sensor ready for return to the controller
+ */
 void OpenInterface::setSensorValue(uint8_t sensorKey, uint8_t sensorValue)
 {
   sensor[sensorKey] = sensorValue;
 }
 
+/**
+ * Set a value of a sensor ready for return to the controller
+ */
 void OpenInterface::setSensorValue(uint8_t sensorKey, int sensorValue)
 {
   sensorInt[sensorKey] = sensorValue;
@@ -482,85 +514,47 @@ void OpenInterface::queryList()
 }
 
 /**
- * Handle switching low side drivers on and off
+ * Handle calling a callback function that uses three bytes as parameters
+ * e.g. leds, pwmLowSideDrivers
  */
-void OpenInterface::lowSideDrivers()
-{
-  uint8_t status;
-  bool result = readByte(&status);
-  if (result && controlLsdOutputCallback)
-  {
-    (*controlLsdOutputCallback)(status);
-  }
-}
-
-/**
- * Handle controlling LEDs
- */
-void OpenInterface::leds()
+void OpenInterface::callCallbackWithThreeBytes(callbackWithThreeBytes callbackFunction)
 {
   uint8_t status[3];
   bool result = readBytes(status, 3);
-  if (result && controlLedsCallback)
+  if (result && callbackFunction)
   {
-    (*controlLedsCallback)(status[0], status[1], status[2]);
+    (*callbackFunction)(status[0], status[1], status[2]);
   }
 }
 
 /**
- * Handle altering the PWM values for low side drivers
+ * Handle calling a callback function that uses one byte as it's parameter
+ * e.g. controlDigitalOutputs, SendIr, waitEvent, controlLsdOutput
  */
-void OpenInterface::pwmLowSideDrivers()
-{
-  uint8_t status[3];
-  bool result = readBytes(status, 3);
-  if (result && controlLsdPwmCallback)
-  {
-    (*controlLsdPwmCallback)(status[0], status[1], status[2]);
-  }
-}
-
-/**
- * Handle manipulating the Digital Outputs
- */
-void OpenInterface::digitalOutputs()
+void OpenInterface::callCallbackWithOneByte(callbackWithOneByte callbackFunction)
 {
   uint8_t status;
   bool result = readByte(&status);
-  if (result && controlDigitalOutputCallback)
+  if (result && callbackFunction)
   {
-    (*controlDigitalOutputCallback)(status);
+    (*callbackFunction)(status);
   }
 }
 
+/**
+ * @todo to be implemented
+ */
 void OpenInterface::stream()
 {
 
 }
 
-void OpenInterface::sendIr()
-{
-  uint8_t status;
-  bool result = readByte(&status);
-  if (result && sendIrCallback)
-  {
-    (*sendIrCallback)(status);
-  }
-}
-
+/**
+ * @todo to be implemented
+ */
 void OpenInterface::showScript()
 {
 
-}
-
-void OpenInterface::waitEvent()
-{
-  uint8_t status;
-  bool result = readByte(&status);
-  if (result && waitEventCallback)
-  {
-    (*waitEventCallback)(status);
-  }
 }
 
 /**

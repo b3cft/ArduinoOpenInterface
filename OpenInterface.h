@@ -138,21 +138,9 @@ private:
 
   void queryList();
 
-  void lowSideDrivers();
-
-  void leds();
-
-  void pwmLowSideDrivers();
-
-  void digitalOutputs();
-
   void stream();
 
-  void sendIr();
-
   void showScript();
-
-  void waitEvent();
 
   void scriptSet();
 
@@ -177,6 +165,10 @@ private:
   bool isDoublePacket(uint8_t packet);
 
   uint8_t opCodeDataLen(uint8_t opCode);
+
+  void callCallbackWithThreeBytes(callbackWithThreeBytes);
+
+  void callCallbackWithOneByte(callbackWithOneByte);
 
 public:
   /**
