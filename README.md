@@ -1,3 +1,6 @@
+OpenInterface
+=============
+
 Do want to start using the [Robot Operating System](http://www.ROS.org/) [TurtleBot](http://www.turtlebot.com/) but don't have access
 to a iRobot Roomba or Create platform.
 
@@ -7,7 +10,8 @@ Then this libary is for *you*.
 
 This code allows an Arduino to use the iRobot Open Interface and respond as if it is a Roomba/Create robot.
 
-*To install:*
+Installing
+----------
 
 * click DOWNLOAD SOURCE from the top right corner.
 * unpack the download.
