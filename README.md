@@ -8,6 +8,7 @@ Then this libary is for *you*.
 This code allows an Arduino to use the iRobot Open Interface and respond as if it is a Roomba/Create robot.
 
 *To install:*
+
 * click DOWNLOAD SOURCE from the top right corner.
 * unpack the download.
 * in your sketches folder create a "libraries" folder if one doesn't exist.
